@@ -20,21 +20,27 @@ namespace Gobblefish.Graphics {
         [SerializeField]
         private int m_Height = 11;
 
+        [SerializeField]
+        private bool m_ResizeOnLoad = true;
+
         void Start() {
-                
-            Camera cam = Camera.main;
+            if (m_ResizeOnLoad) {
+                Resize(GraphicsManager.MainCamera, m_Width, m_Height);
+            }
+        }
+
+        public static void Resize(Camera cam, int width, int height) {
             Vector2 camSize = cam.GetOrthographicDimensions();
 
             float factor = 1f;
-            if (m_Width > camSize.x) {
-                factor = m_Width / camSize.x;
+            if (width > camSize.x) {
+                factor = width / camSize.x;
             }
-            if (m_Height > camSize.y) {
-                factor = Mathf.Max(m_Height / camSize.y, factor);
+            if (height > camSize.y) {
+                factor = Mathf.Max(height / camSize.y, factor);
             }
 
             cam.orthographicSize *= factor;
-            
         }
 
     }

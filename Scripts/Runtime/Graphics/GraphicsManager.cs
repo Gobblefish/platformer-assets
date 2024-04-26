@@ -26,6 +26,11 @@ namespace Gobblefish.Graphics {
         private CameraShake m_CamShake;
         public static CameraShake CamShake => Instance.m_CamShake;
 
+        // The camera shake script.
+        [SerializeField]
+        private CameraResize m_CamResize;
+        public static CameraResize CamResize => Instance.m_CamResize;
+
         // The post processor controller.
         [SerializeField]
         private PostProcessorController m_PostProcessor;
