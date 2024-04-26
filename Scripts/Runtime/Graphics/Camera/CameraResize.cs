@@ -29,7 +29,7 @@ namespace Gobblefish.Graphics {
             }
         }
 
-        public static void Resize(Camera cam, int width, int height) {
+        public void Resize(Camera cam, int width, int height) {
             Vector2 camSize = cam.GetOrthographicDimensions();
 
             float factor = 1f;
