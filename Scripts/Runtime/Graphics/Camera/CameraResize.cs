@@ -43,6 +43,21 @@ namespace Gobblefish.Graphics {
             cam.orthographicSize *= factor;
         }
 
+        public void Resize(Camera cam, float width, float height) {
+            Vector2 camSize = cam.GetOrthographicDimensions();
+
+            float factor = 1f;
+            if (width > camSize.x) {
+                factor = width / camSize.x;
+            }
+            if (height > camSize.y) {
+                factor = Mathf.Max(height / camSize.y, factor);
+            }
+
+            cam.orthographicSize *= factor;
+        }
+
+
     }
 
 }
