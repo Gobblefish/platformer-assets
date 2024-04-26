@@ -20,12 +20,6 @@ namespace Platformer.Character {
     // [RequireComponent(typeof(SpriteRenderer))]
     public class SpritesheetAnimator : CharacterAnimator {
 
-        const float BASE_TIREDNESS = 3f;
-        const float MAX_TIREDNESS = 2.8f;
-        const float MIN_MOVING_FACTOR = 1f;
-        const float PERCENT_TIREDNESS_GAINED_IN_A_SECOND = 0.15f;
-        const float PERCENT_TIREDNESS_LOST_IN_A_SECOND = 0.5f;
-
         [System.Serializable]
         protected class AnimationItem {
             public string name;
@@ -49,15 +43,6 @@ namespace Platformer.Character {
         private SpriteRenderer m_SpriteRenderer = null;
 
         [SerializeField]
-        private SpriteRenderer m_Foreleg = null;
-
-        [SerializeField]
-        private SpriteRenderer m_Backleg = null;
-
-        [SerializeField]
-        private SpriteRenderer m_Body;
-
-        [SerializeField]
         private List<AnimationItem> m_AnimationCollection = new List<AnimationItem>();
 
         // Okay. Lets see if this works.
@@ -67,9 +52,6 @@ namespace Platformer.Character {
         // The sprites this is currently animating through.
         [SerializeField]
         private SpriteAnimation m_CurrentAnimation = null;
-
-        [SerializeField]
-        private float m_Tiredness = 0f;
 
         // The amount this character was stretched last frame.
         [SerializeField, ReadOnly]
@@ -87,28 +69,10 @@ namespace Platformer.Character {
         // Animates the flipbook by setting the animation, frame, and playing any effects.
         protected override void Animate(float dt) {
             Scale(dt);
-            SetTiredness(dt);
-
             m_CurrentAnimation = GetHighestPriorityAnimation().animation;
             m_CurrentAnimation.Tick(dt);
-
-            int halfNextFrame = m_CurrentAnimation.currentFrame;
-            if (m_CurrentAnimation.sprites.Length > 0) {
-                halfNextFrame += (int)Mathf.Ceil(m_CurrentAnimation.sprites.Length / 2f);
-                halfNextFrame = halfNextFrame % m_CurrentAnimation.sprites.Length;
-            }
-            else {
-                return;
-            }
-
-            m_Foreleg.sprite =  m_CurrentAnimation.GetFrame();
-            m_Backleg.sprite = m_CurrentAnimation.sprites[halfNextFrame];
-            
+            m_SpriteRenderer.sprite =  m_CurrentAnimation.GetFrame();
         }
-
-        // public void SetBody(Sprite sprite) {
-        //     m_Body.sprite = sprite;
-        // }
 
         public override void PlayAnimation(string name, float speed) {
             AnimationItem anim = m_AnimationCollection.Find(anim => anim.name == name);
@@ -153,22 +117,6 @@ namespace Platformer.Character {
             }
             m_CachedStretch = stretch;
         }
-
-        
-        private void SetTiredness(float dt) {
-            if (m_Character.Body.velocity.sqrMagnitude > 0.2f) {
-                if (m_Tiredness < MIN_MOVING_FACTOR) {
-                    m_Tiredness = MIN_MOVING_FACTOR;
-                }
-                m_Tiredness += PERCENT_TIREDNESS_GAINED_IN_A_SECOND * dt;
-            }
-            else {
-                m_Tiredness -= PERCENT_TIREDNESS_LOST_IN_A_SECOND * dt;
-            }
-            m_Tiredness = m_Tiredness < 0f ? 0f : m_Tiredness > 1f ? 1f : m_Tiredness;
-            m_TirednessAnimator.SetDuration(BASE_TIREDNESS - MAX_TIREDNESS * m_Tiredness);
-        }
-
 
     }
 

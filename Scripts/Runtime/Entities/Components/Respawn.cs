@@ -12,7 +12,6 @@ using Platformer.Character;
 
 /* --- Definitions --- */
 using Entity = Platformer.Entities.Entity;
-using Projectile = Platformer.Entities.Utility.Projectile;
 using CharacterController = Platformer.Character.CharacterController;
 
 namespace Platformer.Entities.Components {
@@ -39,14 +38,8 @@ namespace Platformer.Entities.Components {
         private float m_TotalActivatedTime = 0f;
         public float TotalTimeActive => m_TotalActivatedTime;
 
-        [SerializeField]
-        private VisualEffect m_EmissionParticle;
-
         [SerializeField, ReadOnly]
         private bool m_Active = false;
-
-        [SerializeField]
-        private Projectile m_CorpseProjectile;
 
         [SerializeField]
         private UnityEvent m_RespawnEvent;
@@ -80,50 +73,27 @@ namespace Platformer.Entities.Components {
             }
         }
 
-        public void CreateCorpse(CharacterController character) {
-
-            Projectile projectile = m_CorpseProjectile.CreateInstance();
-            projectile.transform.position = character.transform.position;
-            projectile.Fire(character.Body.velocity.magnitude, -character.Body.velocity.normalized, 50f);
-            // projectile.Fire(5, Quaternion.Euler(0f, 0f, transform.eulerAngles.z + m_SpitAngle) * Vector2.right);
-
-        }
-
-        public void CreateNewShell(CharacterController character) {
-            character.transform.position = transform.position + Vector3.up * 1.5f;
+        public void OnRespawn(CharacterController character) {
+            character.transform.position = transform.position + (transform.localRotation * Vector3.up) * 1.5f;
             character.Body.SetVelocity(8f * (transform.localRotation * Vector3.up));
-            // character.Animator.Push(character.Default.FallingFastAnim, CharacterAnimator.AnimationPriority.ActionPassiveFalling);
-
             m_RespawnEvent.Invoke();
         }
 
         public void Activate() {
             if (!m_Active) {
+                if (m_TotalActivatedTime == 0f) {
+                    m_FirstActivationTime = PhysicsManager.Time.Ticks;
+                }
                 m_ActivateEvent.Invoke();
             }
-            
             m_Active = true;
-            if (m_EmissionParticle != null) {
-                m_EmissionParticle.Play();
-            }
-            if (m_TotalActivatedTime == 0f) {
-                m_FirstActivationTime = PhysicsManager.Time.Ticks;
-
-                Gobblefish.Graphics.GraphicsManager.Starmap.AddPoint(transform.position);
-
-            }
-            
         }
 
         public void Deactivate() {
             if (m_Active) {
                 m_DeactivateEvent.Invoke();
             }
-
             m_Active = false;
-            if (m_EmissionParticle != null) {
-                m_EmissionParticle.Stop();
-            }        
         }
         
     }

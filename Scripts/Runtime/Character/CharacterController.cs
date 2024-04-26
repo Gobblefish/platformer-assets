@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 // Unity.
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.VFX;
 using UnityEngine.SceneManagement;
 // Gobblefish.
@@ -81,11 +82,7 @@ namespace Platformer.Character {
         private bool m_Dying = false;
 
         [SerializeField]
-        private UnityEngine.VFX.VisualEffect m_DeathEffect;
-        [SerializeField]
-        private Gobblefish.Audio.AudioSnippet m_DeathSound;
-        [SerializeField]
-        private Gobblefish.Animation.SpriteAnimator m_DeathAnimation;
+        private UnityEvent m_OnDeathEvent = new UnityEvent();
 
         // The block that this character respawns at.
         [SerializeField, ReadOnly]
@@ -105,9 +102,8 @@ namespace Platformer.Character {
         [SerializeField]
         private List<CharacterAction> m_PowerActions = new List<CharacterAction>();
 
-        [SerializeField]
-        private Sprite m_DefaultBody;
-
+        public float respawnDuration = 1.2f;
+        public float deathDuration = 0.6f;
         public float deathWeight = 3f;
         public float deathSpeed = 10f;
 
@@ -123,86 +119,49 @@ namespace Platformer.Character {
         // Runs once before the first frame.
         void Start() {
             m_DefaultAction.Enable(this, true);
-            // EnableAllAbilityActions();
-            // DisableAllAbilityActions();
         }
 
-
         public void Reset() {
+            if (m_Dying) { return; }
+            
             if (m_Respawn == null && tag == "Player") {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 return;
             }
 
-            if (m_Dying) {
-                return;
-            }
-
-            Gobblefish.Graphics.GraphicsManager.Starmap.AddPoint(transform.position);
+            m_DefaultAction.Enable(this, false);
 
             // The visual feedback played when dying.
             PhysicsManager.Time.RunHitStop(16);
-            m_Animator.PlayAnimation("OnDeath");
-            m_Animator.PlayAudioVisualEffect(m_DeathEffect, m_DeathSound);
             Gobblefish.Graphics.GraphicsManager.CamShake.ShakeCamera(0.1f, 0.2f);
+            m_Animator.PlayAnimation("OnDeath");
+            m_Animator.PlayAudioVisualEffect("OnDeath");
 
             // Noting the death in the stats.
-            // LevelManager.AddDeath();
-            // LevelManager.Reset();
+            m_OnDeathEvent.Invoke();
 
-            // Resetting the character.
-            m_Respawn.CreateCorpse(this);
-
-            float respawnDelay = 1.2f;
-            float floatTime = 0.6f;
-
-            Disable(respawnDelay);
-            m_DefaultAction.Enable(this, false, true);
+            Disable(respawnDuration);
             DisableAllAbilityActions();
-            m_Animator.SetPowerIndicator(null);
-
-            // m_Body.velocity = -m_Body.velocity; // (-Vector3.up * 2f);
-            // if (m_Body.velocity.sqrMagnitude == 0f) {
-            //     m_Body.velocity = Vector3.up * 2f;
-            // }
-            // if (m_Body.velocity.sqrMagnitude < 3f * 3f) {
-            //     m_Body.velocity = m_Body.velocity.normalized * 3f;
-            // }
-            // if (m_Body.velocity.sqrMagnitude > 15f * 15f) {
-            // }
 
             m_Body.SetWeight(deathWeight);
-            // if (Mathf.Abs(m_Body.velocity.x) > 2f * -m_Body.velocity.y) {
-            //     m_Body.velocity = new Vector2(Mathf.Sign(m_Body.velocity.x), -0.5f);
-            // }
             m_Body.velocity = -m_Body.velocity.normalized * deathSpeed;
-            // Vector2.up + Random.Range(-0.4f, 0.4f) * Vector2.right;
-            // m_Body.velocity = m_Body.velocity.normalized * deathSpeed;
-
-            // m_Body.ReleaseAll();
-            // m_Body.AddTorque(10f);
-
             m_Dying = true;
-            
 
-            // transform.position = m_Respawn.RespawnPosition;
-            StartCoroutine(IERespawn(respawnDelay, floatTime));
+            StartCoroutine(IERespawn(respawnDuration, deathDuration));
 
         }
 
-        private IEnumerator IERespawn(float respawnDelay, float floatTime) {
-            yield return new WaitForSeconds(floatTime);
+        private IEnumerator IERespawn(float respawnDuration, float deathDuration) {
+            yield return new WaitForSeconds(deathDuration);
 
             m_Animator.gameObject.SetActive(false);
             m_Body.SetWeight(0f);
             m_Body.SetVelocity(Vector3.zero);
 
-            yield return new WaitForSeconds(respawnDelay - floatTime);
-            m_Respawn.CreateNewShell(this);
+            yield return new WaitForSeconds(respawnDuration - deathDuration);
+            m_Respawn.OnRespawn(this);
             m_Animator.gameObject.SetActive(true);
-            m_DeathAnimation.Stop();
 
-            // yield return new WaitForSeconds(delay);
             m_Body.SetVelocity(Vector3.up * 1f);
             m_Body.ReleaseXY();
             m_Dying = false;
@@ -261,13 +220,11 @@ namespace Platformer.Character {
             m_FacingDirection = m_DirectionLocked ? m_FacingDirection : m_Input.Direction.Horizontal != 0f ? m_Input.Direction.Horizontal : m_FacingDirection;
             m_FacingWall = PhysicsManager.Collisions.Touching(m_Body.position + m_Collider.offset, m_Collider.radius, Vector3.right * m_FacingDirection,  PhysicsManager.CollisionLayers.Ground);
 
-            if (m_DisableTimer.Active) { 
-                return; 
-            }
-
-            m_DefaultAction.PhysicsUpdate(this, Time.fixedDeltaTime);
-            for (int i = 0; i < m_PowerActions.Count; i++) {
-                m_PowerActions[i].PhysicsUpdate(this, Time.fixedDeltaTime);
+            if (!m_DisableTimer.Active) { 
+                m_DefaultAction.PhysicsUpdate(this, Time.fixedDeltaTime);
+                for (int i = 0; i < m_PowerActions.Count; i++) {
+                    m_PowerActions[i].PhysicsUpdate(this, Time.fixedDeltaTime);
+                }
             }
 
         }

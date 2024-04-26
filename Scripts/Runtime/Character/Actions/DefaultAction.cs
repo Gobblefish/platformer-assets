@@ -63,7 +63,7 @@ namespace Platformer.Character {
 
         // Forcefully clamp internal jumps, usually for prepping external jumps.
         [SerializeField, ReadOnly] 
-        public bool m_ClampJump = false;
+        public bool m_JumpEnabled = false;
 
         // The default speed the character moves at.
         [SerializeField] 
@@ -145,8 +145,8 @@ namespace Platformer.Character {
 
             m_MoveEnabled = true;
             m_FallEnabled = true;
+            m_JumpEnabled = false;
             m_Interacting = false;
-            m_ClampJump = false;
             m_Refreshed = false;
 
             character.Animator.PlayAnimation("Idle");
@@ -156,40 +156,28 @@ namespace Platformer.Character {
         }
 
         // When enabling/disabling this ability by movement and falling seperately.
-        public void Enable(CharacterController character, bool move, bool fall) {
-            Enable(character, true);
+        public void EnableMove(CharacterController character, bool enable) {
+            m_MoveEnabled = enable;
+        }
 
-            m_MoveEnabled = move;
-            m_FallEnabled = fall;
-        
+        // When enabling/disabling this ability by movement and falling seperately.
+        public void EnableFall(CharacterController character, bool enable) {
+            m_FallEnabled = enable;
+        }
+
+        // When enabling/disabling this ability by movement and falling seperately.
+        public void EnableJump(CharacterController character, bool enable) {
+            m_JumpEnabled = enable;
         }
 
         // Runs once every frame to check the inputs for this ability.
         public override void InputUpdate(CharacterController character) {
             if (!m_Enabled) {  return;  }
 
-            // Current.
-            if (character.CurrentInteractable == null) {
-                m_Interacting = false;
-            }
-
             m_Direction = new Vector2(character.Input.Direction.Horizontal, character.Input.Direction.Vertical);
 
             // Jumping.
-            if (character.Input.Actions[0].Pressed && m_Refreshed) {
-                // If interacting with an NPC.
-                if (character.CurrentInteractable != null) {
-                    if (!m_Interacting) {
-                        OnInteract(character);
-                    }
-                    else {
-                        WhileInteracting(character);
-                    }
-                    character.Input.Actions[0].ClearPressBuffer();
-                    return;
-                }
-
-                // The character should jump.
+            if (character.Input.Actions[0].Pressed && m_Refreshed && m_JumpEnabled) {
                 OnJump(character);
 
                 // Release the input and reset the refresh.
@@ -210,7 +198,7 @@ namespace Platformer.Character {
             // Refreshing.
             m_Refreshed = character.OnGround || m_CoyoteTimer.Value > 0f;
 
-            GetDefaultState(character, dt);
+            UpdateDefaultStateAnimation(character, dt);
             if (!m_Enabled) { return; }
 
             // Tick the m_CoyoteTimer timer.
@@ -227,7 +215,7 @@ namespace Platformer.Character {
             
         }
 
-        private void GetDefaultState(CharacterController character, float dt) {
+        private void UpdateDefaultStateAnimation(CharacterController character, float dt) {
 
             if (!character.OnGround) {
                 if (character.Rising) {
@@ -290,20 +278,8 @@ namespace Platformer.Character {
             }
         }
 
-        //
-        private void OnInteract(CharacterController character) {
-            m_Interacting = character.CurrentInteractable.StartInteraction();
-        }
-
-        //
-        private void WhileInteracting(CharacterController character) {
-            m_Interacting = character.CurrentInteractable.ContinueInteraction();
-        }
-
         private void OnJump(CharacterController character) {
             // Refresh the jump settings.
-            if (m_ClampJump) { return; }
-
             RefreshJumpSettings(ref m_JumpSpeed, ref m_Weight, ref m_Sink, m_Height, m_RisingTime, m_FallingTime);
 
             // Jumping.
@@ -317,10 +293,6 @@ namespace Platformer.Character {
             character.Animator.PlayAudioVisualEffect("OnJump");
             character.Animator.PlayAudioVisualEffect("WhileJumping");
 
-        }
-
-        public void ClampJump(bool clamp) {
-            m_ClampJump = clamp;
         }
 
         public void OnExternalJump(CharacterController character, float jumpSpeed) {
@@ -340,7 +312,7 @@ namespace Platformer.Character {
         }
 
         private void OnLand(CharacterController character) {
-            m_ClampJump = false;
+            m_JumpEnabled = false;
 
             character.Animator.PlayAnimation("OnLand");
             character.Animator.PlayAudioVisualEffect("OnLand");

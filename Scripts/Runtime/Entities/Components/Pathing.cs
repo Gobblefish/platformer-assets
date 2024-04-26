@@ -9,8 +9,7 @@ using UnityEngine.U2D;
 using Platformer.Physics;
 
 /* --- Definitions --- */
-using PathingNode = Platformer.Entities.Utility.PathingNode;
-using Reset = Platformer.Entities.Utility.Reset;
+using Platformer.Entities.Utility;
 
 namespace Platformer.Entities.Components {
 
@@ -66,13 +65,14 @@ namespace Platformer.Entities.Components {
 
         void Start() {
 
-            foreach (Transform child in transform) {
-                if (child.GetComponent<Power>() != null) {
-                    m_Speed /= 2f;
+            PathSpeedEditor speedEditor = GetComponent<PathSpeedEditor>();
+            if (speedEditor != null) {
+                if (speedEditor.overrideSpeed) {
+                    m_Speed = speedEditor.speedOverride;
                 }
-                // if (child.GetComponent<Reset>() != null) {
-                //     reset = child.GetComponent<Reset>();
-                // }
+                if (speedEditor.scaleSpeed) {
+                    m_Speed *= speedEditor.speedScalar;
+                }
             }
 
             for (int i = 0; i < m_Nodes.Length; i++) {

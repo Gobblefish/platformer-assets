@@ -97,10 +97,6 @@ namespace Platformer.Character {
 
         }
 
-        public virtual void SetPowerIndicator(Platformer.Entities.Components.Power power) {
-
-        }
-
         public void PlayAudioVisualEffect(string name) {
             m_AudioSnippets.Play(name);
         }

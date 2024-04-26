@@ -90,7 +90,7 @@ namespace Platformer.Entities.Components {
 
         public void ClampMainPlayerJump() {
             Platformer.Character.CharacterController character = Platformer.PlayerManager.Character;
-            // character.Default.ClampJump(true);
+            // character.Default.EnableJump(character, false);
         }
 
         public void OnStartTensing() {
@@ -136,10 +136,10 @@ namespace Platformer.Entities.Components {
             for (int i = 0; i < m_Entity.CollisionContainer.Count; i++) {
                 CharacterController character = m_Entity.CollisionContainer[i].GetComponent<CharacterController>();
                 if (character != null) {
-                    character.Default.ClampJump(true);
+                    character.Default.EnableJump(character, false);
                     if (character.Input.Actions[0].Released) {
                         character.Default.OnExternalJump(character, character.Default.JumpSpeed);
-                        character.Default.ClampJump(false);
+                        character.Default.EnableJump(character, true);
                     }
                 }
             }
@@ -154,7 +154,7 @@ namespace Platformer.Entities.Components {
                     if (true || character.Input.Actions[0].Held) {
                         print("pre-emptive bounce");
                         character.Default.OnExternalJump(character, BOUNCE_SPEED);
-                        character.Default.ClampJump(false);
+                        character.Default.EnableJump(character, true);
                     }
                     
                 }
@@ -168,7 +168,7 @@ namespace Platformer.Entities.Components {
                 CharacterController character = m_Entity.CollisionContainer[i].GetComponent<CharacterController>();
                 if (character != null) {
                     character.Default.OnExternalJump(character, character.Default.JumpSpeed + BOUNCE_SPEED);
-                    character.Default.ClampJump(false);
+                    character.Default.EnableJump(character, true);
                 }
             }
         }
@@ -181,7 +181,7 @@ namespace Platformer.Entities.Components {
                     if (true || character.Input.Actions[0].Held) {
                         print("releasing bounce");
                         character.Default.OnExternalJump(character, BOUNCE_SPEED);
-                        character.Default.ClampJump(false);
+                        character.Default.EnableJump(character, true);
                     }
                 }
             }
@@ -194,7 +194,7 @@ namespace Platformer.Entities.Components {
                 if (character != null) {
                     print("missed bounce");
                     character.Default.OnExternalJump(character, MISSED_BOUNCE_SPEED);
-                    character.Default.ClampJump(false);
+                    character.Default.EnableJump(character, true);
                 }
             }
             m_Entity.ForceClearContainer();

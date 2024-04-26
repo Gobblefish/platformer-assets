@@ -31,11 +31,6 @@ namespace Gobblefish.Graphics {
         private PostProcessorController m_PostProcessor;
         public static PostProcessorController PostProcessor => Instance.m_PostProcessor;
 
-        // The post processor controller.
-        [SerializeField]
-        private Starmap m_Starmap;
-        public static Starmap Starmap => Instance.m_Starmap;
-
         protected override void Awake() {
             m_Camera = Camera.main;
             m_Settings = new GraphicsSettings();
