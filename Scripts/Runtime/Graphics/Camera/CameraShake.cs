@@ -77,7 +77,7 @@ namespace Gobblefish.Graphics {
         // The way the camera moves while it is shaking.
         public void WhileShaking() {
             float strength = GraphicsManager.Settings.camShake * m_ShakeStrength * m_ShakeCurve.Evaluate(1f - (m_Ticks / m_Duration));
-            transform.localPosition = strength * (Vector3)Random.insideUnitCircle.normalized + Vector3.forward * CAMERA_PLANE_DISTANCE;
+            transform.localPosition = strength * (Vector3)UnityEngine.Random.insideUnitCircle.normalized + Vector3.forward * CAMERA_PLANE_DISTANCE;
         }
 
         // Gets a random position within the screen bounds.
