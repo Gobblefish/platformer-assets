@@ -59,20 +59,10 @@ namespace Platformer.Levels.LDtk {
             m_LDtkData = setData == null ? m_LDtkData : setData;
             print(m_LDtkData == null);
 
-            // if (setData != null) {
-            //     PlayerManager playerManager = 
-            // }
             if (dont && setData == null) { return; }
-
 
             OnReload();
         }
-
-        // void Awake() {
-        //     print("hi");
-        //     m_LDtkData = setData == null ? m_LDtkData : setData;
-        //     OnReload();
-        // }
 
         void Update() {
             if (m_Reload && !Application.isPlaying) {
