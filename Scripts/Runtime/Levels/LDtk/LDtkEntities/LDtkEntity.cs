@@ -56,7 +56,7 @@ namespace Platformer.Levels.LDtk {
         }
 
         public void SetPosition(Vector2Int roomOrigin) {
-            Vector3 worldPosition = LevelSection.GridToWorldPosition(m_GridPosition, roomOrigin, m_GridSize);      
+            Vector3 worldPosition = LDtkSection.GridToWorldPosition(m_GridPosition, roomOrigin, m_GridSize);      
             transform.position = worldPosition;
         }
 

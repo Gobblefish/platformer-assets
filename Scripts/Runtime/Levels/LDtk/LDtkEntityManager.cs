@@ -59,7 +59,7 @@ namespace Platformer.Levels.LDtk {
         }
 
         // Generate a entities from a list.
-        public List<LDtkEntity> Generate(LevelSection section, LDtkLayers ldtkLayers) {
+        public List<LDtkEntity> Generate(LDtkSection section, LDtkLayers ldtkLayers) {
 
             // entities, entityData, controlData, entityReferences, transform, worldPosition
 

@@ -10,6 +10,12 @@ namespace Gobblefish.Graphics {
 
     using Platformer.Levels;
 
+    public abstract class CameraTarget {
+
+        public abstract Vector2 GetPosition(Transform defaultTarget);
+
+    }
+
     ///<summary>
     /// Controls the position and quality of the camera.
     ///<summary>
@@ -28,7 +34,7 @@ namespace Gobblefish.Graphics {
 
         // The position that this camera is meant to be at.
         [SerializeField]
-        private List<LevelSectionCamera> m_Targets = new List<LevelSectionCamera>();
+        private List<CameraTarget> m_Targets = new List<CameraTarget>() ;
 
         // The speed with which the camera moves.
         [SerializeField]
@@ -51,15 +57,15 @@ namespace Gobblefish.Graphics {
         }
 
         // Sets the target position of the camera.
-        public void AddTarget(LevelSectionCamera target) {
-            m_Targets = new List<LevelSectionCamera>();
+        public void AddTarget(CameraTarget target) {
+            m_Targets = new List<CameraTarget>();
             if (!m_Targets.Contains(target)) {
                 m_Targets.Add(target);
             }
         }
 
         // Sets the target position of the camera.
-        public void RemoveTarget(LevelSectionCamera target) {
+        public void RemoveTarget(CameraTarget target) {
             if (m_Targets.Contains(target)) {
                 m_Targets.Remove(target);
             }

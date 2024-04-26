@@ -53,7 +53,7 @@ namespace Platformer.Levels.LDtk {
         // private List<DecorationMapParams> m_DecorMapParams = new List<DecorationMapParams>();
         
         // Loads the map layouts for all the given levels.
-        public void Refresh(List<LevelSection> sections, string layerName) {
+        public void Refresh(List<LDtkSection> sections, string layerName) {
 
             m_DecorationMap.ClearAllTiles();
 
@@ -115,7 +115,7 @@ namespace Platformer.Levels.LDtk {
             
         }
 
-        public void GenerateDecorationSection(LevelSection section, string layerName) {
+        public void GenerateDecorationSection(LDtkSection section, string layerName) {
             List<LDtkTileData> tileData = LDtkReader.GetLayerData(section.ldtkLevel, layerName);
 
             for (int i = 0; i < tileData.Count; i++) {

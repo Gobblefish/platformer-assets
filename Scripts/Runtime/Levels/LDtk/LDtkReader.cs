@@ -27,13 +27,12 @@ namespace Platformer.Levels.LDtk {
         [SerializeField] 
         private LDtkTilemapManager m_LDtkTilemapManager;
 
-        // Handles all the tilemap functionality.
-        [SerializeField] 
-        private LevelManager m_LevelManager;
-
         // The JSON data corresponding to the given ldtk data.
         [SerializeField]
         private LDtkLayers m_LDtkLayers = new LDtkLayers();
+
+        [SerializeField]
+        private List<LDtkSection> m_Sections = new List<LDtkSection>();
 
         // The given LDtk file.
         [SerializeField] 
@@ -69,42 +68,28 @@ namespace Platformer.Levels.LDtk {
                 OnReload();
                 m_Reload = false;
             }
-
-            if (setData != null && !playerStarted) {
-                print("trying");
-                LDtkEntity entity = m_LevelManager.Sections.Find(section => section.gameObject.name == "START").Entities.Find(entity => entity.GetComponent<Platformer.Entities.Components.Respawn>() != null);
-                if (entity != null) {
-                    Platformer.PlayerManager.Character.transform.position = entity.transform.position + Vector3.up * 0.5f;
-                    playerStarted = true;
-                }
-            }
         }
 
         public void OnReload() {
             m_JSON = m_LDtkData.FromJson();
             m_LDtkEntityManager.CollectReferences();
+            m_LDtkEntityManager.staticAlternator.Refresh();
 
-            List<LevelSection> sections = CollectSections(m_JSON);
-            Debug.Log("Number of sections: " + sections.Count.ToString());
+            m_Sections = CollectSections(m_JSON);
+            Debug.Log("Number of sections: " + m_Sections.Count.ToString());
             Debug.Log("Number of entity refs: " + m_LDtkEntityManager.All.Count);
 
-            m_LDtkTilemapManager.Refresh(sections, m_LDtkLayers.Ground);    
-
-            m_LDtkEntityManager.staticAlternator.Refresh();
-            for (int i = 0; i < sections.Count; i++) {
-                sections[i].transform.parent = transform;
-                sections[i].DestroyEntities();
-                sections[i].GenerateEntities(m_LDtkEntityManager, m_LDtkLayers);
-            }
-
-            m_LevelManager.SetSections(sections);            
+            m_LDtkTilemapManager.Refresh(m_Sections, m_LDtkLayers.Ground);    
         }
 
         // Collects all the levels from the LDtk file.
-        private static List<LevelSection> CollectSections(LdtkJson json) {
-            List<LevelSection> sections = new List<LevelSection>();
+        private List<LDtkSection> CollectSections(LdtkJson json) {
+            List<LDtkSection> sections = new List<LDtkSection>();
             for (int i = 0; i < json.Levels.Length; i++) {
-                LevelSection section = LevelSection.New(i, json);
+                LDtkSection section = LDtkSection.New(i, json);
+                section.transform.parent = transform;
+                section.DestroyEntities();
+                section.GenerateEntities(m_LDtkEntityManager, m_LDtkLayers);
                 sections.Add(section);
             }
             return sections;

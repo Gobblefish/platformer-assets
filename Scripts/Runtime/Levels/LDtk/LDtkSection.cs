@@ -6,16 +6,10 @@ using System.Collections.Generic;
 using UnityEngine;
 // LDtk.
 using LDtkUnity;
-using Platformer.Levels.LDtk;
-using Gobblefish.Graphics;
 
-namespace Platformer.Levels {
+namespace Platformer.Levels.LDtk {
 
-    /// <summary>
-    ///
-    /// <summary>
-    [RequireComponent(typeof(BoxCollider2D))]
-    public class LevelSection : MonoBehaviour {
+    public class LDtkSection : MonoBehaviour {
 
         public enum State {
             Loaded,
@@ -25,11 +19,6 @@ namespace Platformer.Levels {
         // Whether this level is currently loaded.
         [SerializeField]
         private State state = State.Unloaded;  
-
-        // The trigger box for the camera.
-        [SerializeField]
-        private LevelSectionCamera m_CameraBox;
-        public LevelSectionCamera camHandles => m_CameraBox;
 
         // The id of this level.
         [SerializeField]
@@ -54,31 +43,10 @@ namespace Platformer.Levels {
         public List<LDtkEntity> Entities => m_Entities;
 
         // Creates a new level section camera.
-        public static LevelSection New(int jsonID, LDtkUnity.LdtkJson json) {
-            LevelSection section = new GameObject(json.Levels[jsonID].Identifier, typeof(LevelSection)).GetComponent<LevelSection>();
+        public static LDtkSection New(int jsonID, LDtkUnity.LdtkJson json) {
+            LDtkSection section = new GameObject(json.Levels[jsonID].Identifier, typeof(LDtkSection)).GetComponent<LDtkSection>();
             section.Set(jsonID, json);
             return section;
-        }
-
-        void Update() {
-            
-            if (PartiallyOnScreen() && !entitiesEnabled) {
-                EnableEntities(true);
-            }
-            else if (!PartiallyOnScreen() && entitiesEnabled) {
-                EnableEntities(false);
-            }
-
-        }
-
-        public bool PartiallyOnScreen() {
-            Camera camera = Gobblefish.Graphics.GraphicsManager.MainCamera;
-            (Vector2, Vector2) camCorners = camera.GetCorners();
-
-            Vector3 dim = (Vector3)(camCorners.Item2 - camCorners.Item1) + Vector3.forward;
-            Bounds camBounds = new Bounds((camCorners.Item1 + camCorners.Item2) / 2f, dim);
-            return camBounds.Intersects(m_CameraBox.Box.bounds);
-
         }
 
         public void Set(int jsonID, LDtkUnity.LdtkJson json) {
@@ -91,7 +59,6 @@ namespace Platformer.Levels {
             m_WorldPosition.y = (int)(m_LDtkLevel.WorldY / json.DefaultGridSize);
             m_WorldPosition.x = (int)(m_LDtkLevel.WorldX / json.DefaultGridSize);
             
-            m_CameraBox = LevelSectionCamera.New(this);
         }
 
         public void GenerateEntities(LDtk.LDtkEntityManager entityManager, LDtkLayers ldtkLayers) {
@@ -114,35 +81,6 @@ namespace Platformer.Levels {
                     DestroyImmediate(m_Entities[i].gameObject);
                 }
                 m_Entities.RemoveAll(entity => entity == null);
-            }
-        }
-
-        void OnTriggerEnter2D(Collider2D collider) {
-            if (collider == PlayerManager.Character.Collider) {
-                LevelManager.SetCurrentSection(this);
-                // EnableEntities(true);
-            }
-        }
-
-        public bool entitiesEnabled = false;
-        public void EnableEntities(bool enable) {
-            m_Entities = m_Entities.FindAll(entity => entity != null);
-            for (int i = 0; i < m_Entities.Count; i++) {
-                m_Entities[i].gameObject.SetActive(enable);
-            }
-            if (enable) {
-                for (int i = 0; i < m_Entities.Count; i++) {
-                    if (m_Entities[i].GetComponent<Platformer.Entities.Utility.Reset>()) {
-                        m_Entities[i].GetComponent<Platformer.Entities.Utility.Reset>().HardReset();
-                    }
-                }
-            }
-            entitiesEnabled = enable;
-        }
-
-        void OnTriggerExit2D(Collider2D collider) {
-            if (collider == PlayerManager.Character.Collider) {
-                // EnableEntities(false);
             }
         }
 
