@@ -10,12 +10,6 @@ namespace Gobblefish.Graphics {
 
     using Platformer.Levels;
 
-    public abstract class CameraTarget {
-
-        public abstract Vector2 GetPosition(Transform defaultTarget);
-
-    }
-
     ///<summary>
     /// Controls the position and quality of the camera.
     ///<summary>
