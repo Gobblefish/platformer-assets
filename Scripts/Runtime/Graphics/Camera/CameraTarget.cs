@@ -7,7 +7,6 @@ using UnityEngine.Experimental.Rendering.Universal;
 
 namespace Gobblefish.Graphics {
 
-    [RequireComponent(typeof(Camera))]
     public class CameraTarget : MonoBehaviour {
 
         public virtual Vector2 GetPosition(Transform defaultTarget) {
