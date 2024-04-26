@@ -57,6 +57,7 @@ namespace Platformer.Levels.LDtk {
 
         [SerializeField]
         private List<TilemapSection> m_MapSections = new List<TilemapSection>();
+        public List<TilemapSection> Sections => m_MapSections;
 
         [SerializeField]
         private bool m_GenerateSeperately;
