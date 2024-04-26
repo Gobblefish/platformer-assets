@@ -92,11 +92,15 @@ namespace Platformer.Levels.LDtk {
             // Create a new map.
             if (decorMap == null) {
                 decorMap = Instantiate(m_DecorationMap.gameObject).GetComponent<Tilemap>();
+                decorMap.transform.SetParent(m_Grid.transform);
+                decorMap.transform.localPosition = Vector3.zero;
                 decorMap.gameObject.SetActive(true);
             }
             
             if (collisionMap == null) {
                 collisionMap = Instantiate(m_CollisionMap.gameObject).GetComponent<Tilemap>();
+                collisionMap.transform.SetParent(m_Grid.transform);
+                collisionMap.transform.localPosition = Vector3.zero;
                 collisionMap.gameObject.SetActive(true);
             }
             
