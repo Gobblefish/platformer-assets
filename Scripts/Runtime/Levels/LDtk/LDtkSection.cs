@@ -33,6 +33,7 @@ namespace Platformer.Levels.LDtk {
         public int Width => m_Dimensions.x;
 
         // The position of the bottom left corner of the level in the world.
+        [SerializeField]
         private Vector2Int m_WorldPosition;
         public Vector2Int WorldPosition => m_WorldPosition;
         public Vector2 WorldCenter => GetCenter(this.Width, this.Height, this.m_WorldPosition);
