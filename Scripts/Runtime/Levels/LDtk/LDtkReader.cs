@@ -78,7 +78,12 @@ namespace Platformer.Levels.LDtk {
             m_LDtkEntityManager.CollectReferences();
             m_LDtkEntityManager.staticAlternator.Refresh();
 
-            m_Sections = m_Sections.DestroyAppropriately();
+            for (int i = 0; i < m_Sections.Count; i++) {
+                if (m_Sections[i].gameObject != null) {
+                    m_Sections[i].gameObject.DestroyAppropriately();
+                }
+            }
+
             m_Sections = CollectSections(m_JSON);
             Debug.Log("Number of sections: " + m_Sections.Count.ToString());
             Debug.Log("Number of entity refs: " + m_LDtkEntityManager.All.Count);
