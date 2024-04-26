@@ -33,6 +33,7 @@ namespace Platformer.Levels.LDtk {
 
         [SerializeField]
         private List<LDtkSection> m_Sections = new List<LDtkSection>();
+        public List<LDtkSection> Sections => m_Sections;
 
         // The given LDtk file.
         [SerializeField] 
