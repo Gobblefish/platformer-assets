@@ -25,6 +25,7 @@ namespace Platformer.Levels.LDtk {
     /// </summary>
     public class LDtkTilemapManager : MonoBehaviour {
 
+        [System.Serializable]
         public class TilemapSection {
             public Tilemap decor;
             public Tilemap collision;
