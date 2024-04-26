@@ -46,9 +46,6 @@ namespace Platformer.Character {
 
         /* --- Member Variables --- */
 
-        [SerializeField, ReadOnly]
-        private bool m_Interacting = false;
-
         // Whether the character is using the default movement.
         [SerializeField, ReadOnly] 
         public bool m_MoveEnabled = true;
@@ -145,8 +142,7 @@ namespace Platformer.Character {
 
             m_MoveEnabled = true;
             m_FallEnabled = true;
-            m_JumpEnabled = false;
-            m_Interacting = false;
+            m_JumpEnabled = true;
             m_Refreshed = false;
 
             character.Animator.PlayAnimation("Idle");
@@ -312,8 +308,6 @@ namespace Platformer.Character {
         }
 
         private void OnLand(CharacterController character) {
-            m_JumpEnabled = false;
-
             character.Animator.PlayAnimation("OnLand");
             character.Animator.PlayAudioVisualEffect("OnLand");
 
