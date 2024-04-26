@@ -35,8 +35,8 @@ namespace Platformer.Levels.LDtk {
                 this.collision = collision;
             }
             public void Destroy() {
-                decor.gameObject.DestroyAppropriately();
-                collision.gameObject.DestroyAppropriately();
+                if (decor.gameObject != null) { decor.gameObject.DestroyAppropriately(); }
+                if (collision.gameObject != null) { collision.gameObject.DestroyAppropriately(); }
             }
         }
 
@@ -73,6 +73,7 @@ namespace Platformer.Levels.LDtk {
             for (int i = 0; i < m_MapSections.Count; i++) {
                 m_MapSections[i].Destroy();
             }
+            m_MapSections = new List<TilemapSection>();
 
             if (m_GenerateSeperately) {
                 for (int i = 0; i < sections.Count; i++) {
