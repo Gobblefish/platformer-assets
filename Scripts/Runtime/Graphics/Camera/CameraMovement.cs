@@ -99,6 +99,18 @@ namespace Gobblefish.Graphics {
             
         }
 
+        public void Snap() {
+            Vector2 aggregatedTargets = new Vector2(0f, 0f);
+            if (m_Targets.Count == 0) {
+                if (m_DefaultTarget == null) { return; }
+                aggregatedTargets = m_DefaultTarget.position;
+            }
+            else {
+                GetTarget(out aggregatedTargets);
+            }
+            transform.position = (Vector3)aggregatedTargets + CameraPlane;
+        }
+
         void GetTarget(out Vector2 target) {
             target = new Vector2(0f, 0f);
             for (int i = 0; i < m_Targets.Count; i++) {
