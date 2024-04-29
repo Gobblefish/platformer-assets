@@ -1,6 +1,6 @@
 {
     "name": "Platformer.Runtime",
-    "rootNamespace": "",
+    "rootNamespace": "Platformer",
     "references": [
         "Gobblefish.Runtime",
         "LDtkUnity.Runtime",
